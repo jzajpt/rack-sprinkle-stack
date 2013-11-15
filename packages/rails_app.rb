@@ -46,10 +46,15 @@ package :postgres_database do
   end
 end
 
-package :database_config do
+package :app_shared_config_dir do
   runner "mkdir -p /var/www/#{APP_NAME}/shared/config"
-  database_config_file = "/var/www/#{APP_NAME}/shared/config/database.yml"
+  runner "chown -R #{DEPLOY_USER}:#{DEPLOY_USER} /var/www/#{APP_NAME}/shared"
+end
 
+package :database_config do
+  requires :app_shared_config_dir
+
+  database_config_file = "/var/www/#{APP_NAME}/shared/config/database.yml"
   file database_config_file, :contents => render('database.yml')
   runner "chown -R #{DEPLOY_USER}:#{DEPLOY_USER} #{database_config_file}"
 
@@ -59,9 +64,9 @@ package :database_config do
 end
 
 package :app_env_config do
-  runner "mkdir -p /var/www/#{APP_NAME}/shared/config"
-  env_config_file = "/var/www/#{APP_NAME}/shared/config/dotenv"
+  requires :app_shared_config_dir
 
+  env_config_file = "/var/www/#{APP_NAME}/shared/config/dotenv"
   push_text "SECRET_TOKEN=#{SecureRandom.hex(42)}", env_config_file
   runner "chown -R #{DEPLOY_USER}:#{DEPLOY_USER} #{env_config_file}"
 end

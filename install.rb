@@ -14,7 +14,7 @@ $user = 'deploy'
 
 policy :myapp, roles: :app do
 
-  requires :essential
+  requires :apt_update
   requires :tools
   requires :git
   requires :deployer
