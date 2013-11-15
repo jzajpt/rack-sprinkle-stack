@@ -28,6 +28,7 @@ end
 
 
 package :install_ruby do
+  requires :build_essential
   requires :install_rbenv
   requires :install_rbenv_sudo
   version '2.0.0-p247'
