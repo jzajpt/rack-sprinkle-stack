@@ -1,0 +1,10 @@
+production: &default
+  adapter: postgresql
+  database: <%= DB_NAME %>
+  username: <%= DB_USER %>
+  password: <%= DB_PASSWORD %>
+  encoding: utf8
+  min_messages: warning
+  pool: 5
+  timeout: 5000
+
