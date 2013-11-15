@@ -17,9 +17,9 @@ Following packages will be installed:
 * Redis
 * Postgresql
 
-## Instructions
+## Usage
 
-Install Sprinkle gem on your box:
+Install Sprinkle gem on your local machine:
 
 ```shell
 gem install sprinkle
@@ -31,4 +31,6 @@ Sprinkle:
 ```shell
 sprinkle -c -s install.rb 
 ```
+
+Please note that setup this has been tested only on Ubuntu 12.04 LTS.
 
