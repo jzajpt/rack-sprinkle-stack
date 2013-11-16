@@ -1,0 +1,7 @@
+Defaults env_keep += "RBENV_ROOT"
+
+Cmnd_Alias FOREMAN=/home/deploy/.rbenv/shims/bundle exec foreman *
+Cmnd_Alias SERVICE=/usr/bin/service
+Cmnd_Alias DEPLOY=FOREMAN, SERVICE
+
+<%= DEPLOY_USER %> ALL=(ALL) NOPASSWD:DEPLOY

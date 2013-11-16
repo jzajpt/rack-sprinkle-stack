@@ -4,7 +4,7 @@ package :rails_app, :provides => :app do
   description "Finalize settings for the rails app"
 
   requires :app_dir, :known_hosts, :postgres_user, :postgres_database,
-    :database_config, :app_env_config
+    :database_config, :app_env_config, :deploy_sudoers
 end
 
 package :app_dir do
@@ -69,5 +69,15 @@ package :app_env_config do
   env_config_file = "/var/www/#{APP_NAME}/shared/config/dotenv"
   push_text "SECRET_TOKEN=#{SecureRandom.hex(42)}", env_config_file
   runner "chown -R #{DEPLOY_USER}:#{DEPLOY_USER} #{env_config_file}"
+end
+
+package :deploy_sudoers do
+  sudoers = "/etc/sudoers.d/#{DEPLOY_USER}_conf"
+  file sudoers, :contents => render('sudoers')
+  runner "chmod 0440 #{sudoers}"
+
+  verify do
+    has_file sudoers
+  end
 end
 

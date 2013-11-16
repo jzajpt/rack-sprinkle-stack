@@ -14,23 +14,9 @@ package :install_rbenv do
 end
 
 
-package :install_rbenv_sudo do
-  requires :install_rbenv
-  description 'Ruby RBEnv-sudo'
-
-  runner "sudo -u #{DEPLOY_USER} -i mkdir -p /home/#{DEPLOY_USER}/.rbenv/plugins"
-  runner "sudo -u #{DEPLOY_USER} -i git clone git://github.com/dcarley/rbenv-sudo.git /home/#{DEPLOY_USER}/.rbenv/plugins/rbenv-sudo"
-
-  verify do
-    has_executable "/home/#{DEPLOY_USER}/.rbenv/plugins/rbenv-sudo/bin/rbenv-sudo"
-  end
-end
-
-
 package :install_ruby do
   requires :build_essential
   requires :install_rbenv
-  requires :install_rbenv_sudo
   version '2.0.0-p247'
 
   runner "sudo -u #{DEPLOY_USER} -i rbenv install #{version}"
