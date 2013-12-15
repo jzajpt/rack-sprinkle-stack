@@ -4,11 +4,12 @@ package :postgres, :provides => :database do
 end
 
 package :postgres_core do
-  apt %w( postgresql postgresql-client libpq-dev )
+  apt %w( postgresql postgresql-contrib postgresql-client libpq-dev )
 
   verify do
     has_executable 'psql'
     has_apt 'postgresql'
+    has_apt 'postgresql-contrib'
     has_apt 'postgresql-client'
     has_apt 'libpq-dev'
   end
