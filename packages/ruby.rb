@@ -17,13 +17,13 @@ end
 package :install_ruby do
   requires :build_essential
   requires :install_rbenv
-  version '2.0.0-p247'
+  version RUBY_VERSION
 
   runner "sudo -u #{DEPLOY_USER} -i rbenv install #{version}"
   runner "sudo -u #{DEPLOY_USER} -i rbenv rehash"
 
   verify do
-    has_executable "/home/#{DEPLOY_USER}/.rbenv/shims/ruby"
+    has_executable "/home/#{DEPLOY_USER}/.rbenv/versions/#{version}/bin/ruby"
   end
 end
 
@@ -31,7 +31,7 @@ end
 package :use_rbenv do
   requires :install_ruby
 
-  version '2.0.0-p247'
+  version RUBY_VERSION
 
   runner "sudo -u #{DEPLOY_USER} -i rbenv rehash"
   runner "sudo -u #{DEPLOY_USER} -i rbenv global #{version}"
