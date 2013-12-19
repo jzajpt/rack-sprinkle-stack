@@ -4,7 +4,7 @@ package :rails_app, :provides => :app do
   description "Finalize settings for the rails app"
 
   requires :app_dir, :known_hosts, :postgres_user, :postgres_database,
-    :database_config, :app_env_config, :deploy_sudoers
+    :database_config, :app_env_config, :app_nginx_config, :deploy_sudoers
 end
 
 package :app_dir do
@@ -71,6 +71,16 @@ package :app_env_config do
   runner "chown -R #{DEPLOY_USER}:#{DEPLOY_USER} #{env_config_file}"
 end
 
+package :app_nginx_config do
+  requires :nginx_binary
+
+  nginx_config_file = "/etc/nginx/conf.d/#{APP_NAME}.conf"
+  file nginx_config_file, :contents => render('nginx_server')
+
+  verify do
+    has_file nginx_config_file
+  end
+end
 package :deploy_sudoers do
   sudoers = "/etc/sudoers.d/#{DEPLOY_USER}_conf"
   file sudoers, :contents => render('sudoers')

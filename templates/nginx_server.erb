@@ -1,0 +1,76 @@
+upstream <%= APP_NAME %>-cluster {
+  server 127.0.0.1:5000;
+}
+
+# the server directive is nginx's virtual host directive.
+server {
+  listen 80;
+  server_name <%= APP_NAME %>.com;
+  root /var/www/<%= APP_NAME %>/current/public;
+
+  access_log  /var/log/nginx/<%= APP_NAME %>.access.log  main;
+  error_log //var/log/nginx/<%= APP_NAME %>.error.log info;
+
+  if (-f $document_root/system/maintenance.html) {
+    rewrite  ^(.*)$  /system/maintenance.html last;
+    break;
+  }
+
+  location / {
+    proxy_set_header  X-Real-IP  $remote_addr;
+
+    # needed for HTTPS
+    proxy_set_header  X-Forwarded-For $proxy_add_x_forwarded_for;
+    proxy_set_header Host $http_host;
+    proxy_redirect off;
+    proxy_max_temp_file_size 0;
+
+    if (-f $request_filename) {
+      break;
+    }
+
+    # check for index.html for directory index
+    # if its there on the filesystem then rewite
+    # the url to add /index.html to the end of it
+    # and then break to send it to the next config rules.
+    if (-f $request_filename/index.html) {
+      rewrite (.*) $1/index.html break;
+    }
+
+    # this is the meat of the rails page caching config
+    # it adds .html to the end of the url and then checks
+    # the filesystem for that file. If it exists, then we
+    # rewite the url to have explicit .html on the end
+    # and then send it on its way to the next config rule.
+    # if there is no file on the fs then it sets all the
+    # necessary headers and proxies to our upstream mongrels
+    if (-f $request_filename.html) {
+      rewrite (.*) $1.html break;
+    }
+
+    if (!-f $request_filename) {
+      proxy_pass http://<%= APP_NAME %>-cluster;
+      break;
+    }
+  }
+
+  location ~* ^/assets/ {
+    gzip_static on;
+
+    # Per RFC2616 - 1 year maximum expiry
+    expires 1y;
+    add_header Cache-Control public;
+
+    # Some browsers still send conditional-GET requests if there's a
+    # Last-Modified header or an ETag header even if they haven't
+    # reached the expiry date sent in the Expires header.
+    add_header Last-Modified "";
+    add_header ETag "";
+    break;
+  }
+
+  error_page   500 502 503 504  /500.html;
+  location = /500.html {
+    root   /var/www/<%= APP_NAME %>/current/public;
+  }
+}
