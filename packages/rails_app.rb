@@ -4,7 +4,8 @@ package :rails_app, :provides => :app do
   description "Finalize settings for the rails app"
 
   requires :app_dir, :known_hosts, :postgres_user, :postgres_database,
-    :database_config, :app_env_config, :app_nginx_config, :deploy_sudoers
+    :database_config, :app_env_config, :app_nginx_config, :deploy_sudoers,
+    :app_monit_config, :unicorn_script
 end
 
 package :app_dir do
@@ -81,6 +82,7 @@ package :app_nginx_config do
     has_file nginx_config_file
   end
 end
+
 package :deploy_sudoers do
   sudoers = "/etc/sudoers.d/#{DEPLOY_USER}_conf"
   file sudoers, :contents => render('sudoers')
@@ -88,6 +90,31 @@ package :deploy_sudoers do
 
   verify do
     has_file sudoers
+  end
+end
+
+package :app_monit_config do
+  requires :monit_binary
+
+  monit_config_file = "/etc/monit/conf.d/#{APP_NAME}.conf"
+  file monit_config_file, :contents => render('monit_app')
+
+  verify do
+    has_file monit_config_file
+  end
+end
+
+package :unicorn_script do
+  requires :app_dir
+
+  runner "mkdir -p /var/www/#{APP_NAME}/shared/bin"
+  unicorn_script_file = "/var/www/#{APP_NAME}/shared/bin/unicorn_script.sh"
+  file unicorn_script_file, :contents => render('unicorn_script.sh')
+  runner "chown -R '#{DEPLOY_USER}:#{DEPLOY_USER}' #{unicorn_script_file}"
+  runner "chmod +x #{unicorn_script_file}"
+
+  verify do
+    has_file unicorn_script_file
   end
 end
 

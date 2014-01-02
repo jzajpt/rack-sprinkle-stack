@@ -1,5 +1,6 @@
 upstream <%= APP_NAME %>-cluster {
-  server 127.0.0.1:5000;
+  server unix:/var/www/<%= APP_NAME %>/shared/tmp/sockets/unicorn.sock
+      fail_timeout=0;
 }
 
 # the server directive is nginx's virtual host directive.
@@ -74,3 +75,4 @@ server {
     root   /var/www/<%= APP_NAME %>/current/public;
   }
 }
+

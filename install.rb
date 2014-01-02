@@ -9,8 +9,9 @@ require './packages/postgres'
 require './packages/redis'
 require './packages/utilities'
 require './packages/rails_app'
-
-$user = 'deploy'
+require './packages/rabbitmq'
+require './packages/nginx'
+require './packages/monit'
 
 policy :myapp, roles: :app do
 
@@ -21,18 +22,20 @@ policy :myapp, roles: :app do
   requires :ruby
   requires :postgres
   requires :nosql
+  requires :message_bus
   requires :app
+  requires :webserver
+  requires :monitoring
 
 end
 
 deployment do
 
   delivery :ssh do
-    user ROOT_USER
-    password ROOT_USER_PASSWORD
+    user defined?(ROOT_USER) ? ROOT_USER : 'root'
+    password defined?(ROOT_USER_PASSWORD) ? ROOT_USER_PASSWORD : nil
     role :app, HOST
   end
-
 
   source do
     prefix   '/usr/local'
