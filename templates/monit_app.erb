@@ -1,8 +1,8 @@
 check process <%= APP_NAME %>_worker with pidfile /var/www/<%= APP_NAME %>/shared/tmp/pids/unicorn.pid
-  start program = "/usr/bin/sudo -u deploy /var/www/<%= APP_NAME %>/shared/bin/unicorn_script.sh start"
-  stop program = "/usr/bin/sudo -u deploy /var/www/<%= APP_NAME %>/shared/bin/unicorn_script.sh stop"
+  start program = "/usr/bin/sudo -i -u deploy /var/www/<%= APP_NAME %>/shared/bin/unicorn_script.sh start"
+  stop program = "/usr/bin/sudo -i -u deploy /var/www/<%= APP_NAME %>/shared/bin/unicorn_script.sh stop"
   if totalmem > 70% for 4 cycles then alert
   if totalmem > 90% for 6 cycles then restart
   if cpu > 70% for 4 cycles then alert
-  if cpu > 90% for 6 cycles then exec restart
+  if cpu > 90% for 6 cycles then restart
 
